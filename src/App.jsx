@@ -1,35 +1,17 @@
-import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import axios from 'axios'
+import Button from "./utility/Button";
+import { useTheme } from "./utility/ThemeProvider";
 
-function App() {
-  const [jokes, setJokes] = useState([])
+const App = () => {
+  const { darkMode, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    axios.get('/api/jokes')
-    .then((response) => {
-      setJokes(response.data)
-    } )
-    .catch((error) => {
-      console.log(error)
-    })
-  })
   return (
-    <>
-     <h1>Hello</h1>
-     <p>JOKES: {jokes.length}</p>
-     {
-      jokes.map((joke, index) => (
-        <div key={joke.id}>
-          <h3>{joke.title}</h3>
-          <p>{joke.content}</p>
-        </div>
-      ))
-     }
-    </>
-  )
-}
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h1 className="text-2xl font-bold">
+        {darkMode ? "Dark Mode 🌙" : "Light Mode ☀️"}
+      </h1>
+      <Button onClick={toggleTheme}>Toggle Theme</Button>
+    </div>
+  );
+};
 
-export default App
+export default App;
