@@ -1,16 +1,22 @@
-import Button from "./utility/Button";
-import { useTheme } from "./utility/ThemeProvider";
 
+import ThemeToggle from "./utility/ToggleTheme";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import HabitCreation from "./pages/HabitCreation";
+import ProfilePage from "./pages/ProfilePage";
 const App = () => {
-  const { darkMode, toggleTheme } = useTheme();
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-2xl font-bold">
-        {darkMode ? "Dark Mode 🌙" : "Light Mode ☀️"}
-      </h1>
-      <Button onClick={toggleTheme}>Toggle Theme</Button>
-    </div>
+    <>
+        <ThemeToggle />
+        <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/create-habit" element={<HabitCreation />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Routes>
+    </Router>
+
+    </>
   );
 };
 

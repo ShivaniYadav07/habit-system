@@ -22,18 +22,16 @@ export const ThemeProvider = ({ children }) => {
   return (
     <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
       <div
-        className={`min-h-screen transition-all duration-300 relative ${
+        className={`min-h-screen w-full transition-all duration-300 relative ${
           darkMode
             ? "bg-gradient-to-br from-gray-900 via-purple-950 to-black text-white"
             : "bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 text-black"
         }`}
       >
-        
         {children}
       </div>
     </ThemeContext.Provider>
   );
 };
 
-// ✅ Correct export method
 export const useTheme = () => useContext(ThemeContext);
