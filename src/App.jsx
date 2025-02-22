@@ -7,10 +7,12 @@ import ToggleTheme from "./utility/ToggleTheme";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Welcome from "./pages/Welcome";
+import Avatar from "./components/Avatar";
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideSidebar = ["/login", "/signup"].includes(location.pathname);
+  const hideSidebar = ["/login", "/signup", "/welcome", "/avatar"].includes(location.pathname);
 
   return (
     <div className="flex">
@@ -26,11 +28,9 @@ const App = () => {
       <ToggleTheme />
       <Router>
         <Routes>
-          {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
-          {/* Protected Routes */}
           <Route
             path="/"
             element={
@@ -57,6 +57,26 @@ const App = () => {
               <ProtectedRoute>
                 <Layout>
                   <ProfilePage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/welcome"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Welcome />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/avatar"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Avatar />
                 </Layout>
               </ProtectedRoute>
             }

@@ -32,7 +32,7 @@ export default function Login() {
       login(userData); 
       localStorage.setItem("user", JSON.stringify(userData));
 
-      navigate("/"); 
+      navigate("/welcome"); 
     } catch (err) {
       setError(err.response?.data?.message || "Login failed!");
     } finally {
@@ -63,14 +63,14 @@ export default function Login() {
               type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password"
-              className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 outline-none"
+              className="w-full p-4 text-gray-800 text-lg rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 outline-none"
               value={formData.password}
               onChange={handleChange}
               required
             />
             <button
               type="button"
-              className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute top-1/2 text-gray-800 right-4 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}

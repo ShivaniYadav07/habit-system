@@ -1,8 +1,25 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../components/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) return null; // Jab tak loading hai, blank screen dikhao
+
+  const hasCompletedWelcome = localStorage.getItem("hasCompletedWelcome");
+  const hasCompletedAvatar = localStorage.getItem("hasCompletedAvatar");
+
+  // Agar welcome complete ho gaya hai, toh wapas jane na do
+  if (location.pathname === "/welcome" && hasCompletedWelcome) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Agar avatar complete ho gaya hai, toh wapas jane na do
+  if (location.pathname === "/avatar" && hasCompletedAvatar) {
+    return <Navigate to="/" replace />;
+  }
+
   return user ? children : <Navigate to="/login" />;
 };
 

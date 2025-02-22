@@ -53,7 +53,7 @@ export default function Signup() {
       };
       login(userData)
       alert("Signup successful!");
-      window.location.href = "/";
+      window.location.href = "/welcome";
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed!");
     } finally {
