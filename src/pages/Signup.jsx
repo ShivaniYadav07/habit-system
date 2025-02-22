@@ -50,6 +50,7 @@ export default function Signup() {
         username: response.data.user.username,
         email: response.data.user.email,
         gender: response.data.user.gender,
+        avatar: response.data.user.gender
       };
       login(userData)
       alert("Signup successful!");

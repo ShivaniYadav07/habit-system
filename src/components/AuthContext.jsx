@@ -4,19 +4,27 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // 🆕 Add loading state
+  const [loading, setLoading] = useState(true); // 
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-    setLoading(false); // ✅ Once check is done, stop loading
+    setLoading(false); // 
   }, []);
 
   const login = (userData) => {
     localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
+  };
+  const updateAvatar = (avatarUrl) => {
+    if (user) {
+      const updatedUser = { ...user, avatar: avatarUrl };
+      console.log("Updated User Data:", updatedUser); 
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    }
   };
 
   const logout = () => {
@@ -25,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, updateAvatar, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
