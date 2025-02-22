@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "../utility/Button";
 import axios from "axios";
+import { useAuth } from "../components/AuthContext";
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -15,7 +16,7 @@ export default function Signup() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const { login } = useAuth();
   const handleChange = (e) => {
     setFormData({
       ...formData, // 
@@ -36,7 +37,7 @@ export default function Signup() {
   
     try {
       const response = await axios.post("/api/v1/register", { 
-        username: formData.username,  // ✅ Fix: `fullName` → `username`
+        username: formData.username,  
         email: formData.email,
         password: formData.password,
         gender: formData.gender,
@@ -44,8 +45,15 @@ export default function Signup() {
   
       console.log(response.data);
   
+      const userData = {
+        token: response.data.token, 
+        username: response.data.user.username,
+        email: response.data.user.email,
+        gender: response.data.user.gender,
+      };
+      login(userData)
       alert("Signup successful!");
-      window.location.href = "/login";
+      window.location.href = "/";
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed!");
     } finally {
