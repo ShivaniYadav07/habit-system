@@ -1,29 +1,39 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../components/AuthContext";
+import { useState, useEffect } from "react";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
+
+  // ✅ Always initialize state outside conditions
+  const [redirectToWelcome, setRedirectToWelcome] = useState(false);
+
+  // ✅ Always read localStorage values in the same order
   const isNewUser = localStorage.getItem("isNewUser") === "true";
+  const hasCompletedWelcome = localStorage.getItem("hasCompletedWelcome") === "true";
+  const hasCompletedAvatar = localStorage.getItem("hasCompletedAvatar") === "true";
 
-  if (loading) return null; // Jab tak loading hai, blank screen dikhao
+  useEffect(() => {
+    if (isNewUser) {
+      localStorage.removeItem("isNewUser");
+      setRedirectToWelcome(true);
+    }
+  }, [isNewUser]); // ✅ No conditional execution inside useEffect
 
-  const hasCompletedWelcome = localStorage.getItem("hasCompletedWelcome");
-  const hasCompletedAvatar = localStorage.getItem("hasCompletedAvatar");
+  if (loading) return null; // ✅ Don't proceed until authentication is checked
 
-  // Agar welcome complete ho gaya hai, toh wapas jane na do
+  // 🚀 Redirect logic (kept outside useEffect to maintain hook order)
+  if (redirectToWelcome) {
+    return <Navigate to="/welcome" replace />;
+  }
+
   if (location.pathname === "/welcome" && hasCompletedWelcome) {
     return <Navigate to="/" replace />;
   }
 
-  // Agar avatar complete ho gaya hai, toh wapas jane na do
   if (location.pathname === "/avatar" && hasCompletedAvatar) {
     return <Navigate to="/" replace />;
-  }
-
-  if (isNewUser) {
-    localStorage.removeItem("isNewUser"); // ✅ Flag hata do, taaki sirf ek baar ho
-    return <Navigate to="/welcome" replace />;
   }
 
   return user ? children : <Navigate to="/login" />;
