@@ -14,16 +14,18 @@ export const AuthProvider = ({ children }) => {
     setLoading(false); // 
   }, []);
 
-  const login = (userData) => {
+  const login = (userData, isNewUser = false) => {
     localStorage.setItem("user", JSON.stringify(userData));
+    if (isNewUser) {
+      localStorage.setItem("isNewUser", "true");
+    }
     setUser(userData);
   };
   const updateAvatar = (avatarUrl) => {
     if (user) {
       const updatedUser = { ...user, avatar: avatarUrl };
-      console.log("Updated User Data:", updatedUser); 
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      setUser(updatedUser);
+      setUser(updatedUser); 
     }
   };
 

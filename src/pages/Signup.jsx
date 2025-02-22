@@ -52,7 +52,7 @@ export default function Signup() {
         gender: response.data.user.gender,
         avatar: response.data.user.gender
       };
-      login(userData)
+      login(userData, true)
       alert("Signup successful!");
       window.location.href = "/welcome";
     } catch (err) {
