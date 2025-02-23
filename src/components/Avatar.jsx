@@ -18,52 +18,55 @@ const Avatar = () => {
   }, []);
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]); // ✅ File state me store kar rahe hain
+    const file = event.target.files[0];
+    console.log("📂 File Selected:", file);
+
+    if (file) {
+      setSelectedFile(file);
+    }
   };
 
   const generateNewAvatar = () => {
     setAvatarSeed(Math.random().toString(36).substring(7));
   };
+  
 
   const avatar = `https://api.dicebear.com/7.x/${avatarStyle}/svg?seed=${avatarSeed}`;
 
   const uploadAvatar = async () => {
     setLoading(true);
-
+    
     try {
+      // Fetch image as a Blob
+      const response = await fetch(avatar);
+      const blob = await response.blob();
+      
       const formData = new FormData();
-
-      if (selectedFile) {
-        formData.append("avatar", selectedFile); // ✅ Custom uploaded file
-      } else {
-        formData.append("avatar", avatar); // ✅ Dicebear Avatar ka URL
-      }
-
+      formData.append("avatar", blob, "avatar.png"); // ✅ File Append
+  
       const token = user?.token;
       const res = await axios.post("/api/v1/upload-avatar", formData, {
         withCredentials: true,
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`, 
         },
       });
-
-      console.log("✅ Upload Response:", res.data);
-
+  
       if (res.data.success) {
-        updateAvatar(res.data.avatar);
-        alert("✅ Avatar uploaded successfully!");
+        alert("Avatar uploaded successfully!");
         navigate("/");
       } else {
-        alert("❌ Failed to upload avatar");
+        alert("Failed to upload avatar");
       }
     } catch (error) {
-      console.error("❌ Error uploading avatar:", error);
-      alert("❌ Server error! Please try again.");
+      console.error("Error uploading avatar:", error);
+      alert("Server error! Please try again.");
     }
-
+    
     setLoading(false);
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6">
