@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "../utility/Card";
 import { Button } from "../utility/Button";
+import Loader from "../components/Loader";
 
  const Home = () => {
   const [habits, setHabits] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setTimeout(() => {
@@ -12,12 +14,16 @@ import { Button } from "../utility/Button";
         { id: 2, name: "Reading", streak: 10 },
         { id: 3, name: "Meditation", streak: 3 }
       ]);
+      setLoading(false)
     }, 1000);
   }, []);
   return (
     <div className="p-6 space-y-8">
       <h1 className="text-4xl font-bold text-center ">Your Habit Tracker</h1>
-      
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="bg-gradient-to-r from-pink-500 to-red-500 ">
           <Card.Header>Total Habits</Card.Header>
@@ -56,6 +62,8 @@ import { Button } from "../utility/Button";
           ))
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };

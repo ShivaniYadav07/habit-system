@@ -9,6 +9,7 @@ import { Button } from "../utility/Button";
 import goal from "../assets/goal.jpg"
 import streak from "../assets/streak.webp"
 import reminder from "../assets/reminder.webp"
+import Loader from "../components/Loader";
 
 
 const steps = [
@@ -35,14 +36,24 @@ const steps = [
 const Welcome = () => {
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     localStorage.setItem("hasCompletedWelcome", "true");
 
     // Remove `/welcome` from history
     window.history.replaceState(null, "", "/avatar");
+    
+    setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
   }, []);
+  if (loading) {
+    return <Loader />;
+  }
   return (
+   
     <div className="min-h-screen flex flex-col items-center justify-center  dark:from-gray-800 dark:to-gray-900 p-6">
       <motion.div
         key={step}
