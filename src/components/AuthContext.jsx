@@ -22,12 +22,14 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
   const updateAvatar = (avatarUrl) => {
-    if (user) {
-      const updatedUser = { ...user, avatar: avatarUrl };
+    setUser((prevUser) => {
+      if (!prevUser) return null; // ✅ Agar user null hai to kuchh na karo
+      const updatedUser = { ...prevUser, avatar: avatarUrl };
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      setUser(updatedUser); 
-    }
+      return updatedUser;
+    });
   };
+  
 
   const logout = () => {
     localStorage.removeItem("user");

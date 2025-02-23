@@ -37,10 +37,12 @@ const Avatar = () => {
     setLoading(true);
     
     try {
-      // Fetch image as a Blob
+      // ✅ Clone Response Before Using blob()
       const response = await fetch(avatar);
+      const responseClone = response.clone();
+  
       const blob = await response.blob();
-      
+  
       const formData = new FormData();
       formData.append("avatar", blob, "avatar.png"); // ✅ File Append
   
@@ -53,6 +55,15 @@ const Avatar = () => {
         },
       });
   
+      // ✅ Debugging API Response
+      console.log("✅ Full API Response:", res.data);
+  
+      if (!res.data || !res.data.avatar) {
+        throw new Error("Avatar URL missing in API response");
+      }
+  
+      updateAvatar(res.data.avatar);
+  
       if (res.data.success) {
         alert("Avatar uploaded successfully!");
         navigate("/");
@@ -60,12 +71,13 @@ const Avatar = () => {
         alert("Failed to upload avatar");
       }
     } catch (error) {
-      console.error("Error uploading avatar:", error);
+      console.error("❌ Error uploading avatar:", error);
       alert("Server error! Please try again.");
     }
-    
+  
     setLoading(false);
   };
+  
   
 
   return (

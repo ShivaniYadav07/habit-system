@@ -15,12 +15,10 @@ const ProtectedRoute = ({ children }) => {
   const hasCompletedAvatar = localStorage.getItem("hasCompletedAvatar") === "true";
 
   useEffect(() => {
-    if (isNewUser) {
-      localStorage.removeItem("isNewUser");
-      setRedirectToWelcome(true);
+    if (isNewUser && !hasCompletedWelcome) {
+      localStorage.setItem("hasCompletedWelcome", "false"); // ✅ Prevent losing state
     }
-  }, [isNewUser]); // ✅ No conditional execution inside useEffect
-
+  }, [isNewUser, hasCompletedWelcome]);
   if (loading) return null; // ✅ Don't proceed until authentication is checked
 
   // 🚀 Redirect logic (kept outside useEffect to maintain hook order)
@@ -28,8 +26,8 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/welcome" replace />;
   }
 
-  if (location.pathname === "/welcome" && hasCompletedWelcome) {
-    return <Navigate to="/" replace />;
+  if (location.pathname === "/welcome" && hasCompletedWelcome === "false") {
+    return children; // ✅ Allow access to welcome page
   }
 
   if (location.pathname === "/avatar" && hasCompletedAvatar) {
