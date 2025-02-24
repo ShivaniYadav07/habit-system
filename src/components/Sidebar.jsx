@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Home, List, User, Settings, Menu, LogOut } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "./AuthContext";
 import axios from "axios";
@@ -8,6 +8,7 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
 
   const handleSidebarToggle = () => {
     setIsOpen((prev) => !prev);
@@ -20,7 +21,22 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("/api/v1/logout", {}, { withCredentials: true });
+
+      const token = user?.token; // Token extract karo
+    console.log("🔹 Extracted Token:", token);
+
+    if (!token) {
+      console.error("No token found, user may already be logged out.");
+      logout(); // Local UI se user hatao
+      navigate("/login");
+      return;
+    }
+      await axios.post("/api/v1/logout", {},
+         { withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ Ensure token is sent
+          },
+          });
   
       logout();
       navigate("/login");
@@ -54,7 +70,7 @@ const Sidebar = () => {
           <Link to={item.path} key={index} className="block">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="flex items-center cursor-pointer gap-4 p-3 rounded-lg transition bg-gray-100 dark:bg-gray-800 hover:bg-pink-500 dark:hover:bg-purple-600 text-gray-800 dark:text-gray-200"
+              className="flex items-center cursor-pointer gap-4 p-3 rounded-lg transition dark:bg-pink-600/30 backdrop-blur-lg  hover:bg-gradient-to-r from-pink-400 to-purple-500 dark:hover:bg-gradient-to-r from-pink-400 to-purple-500 text-gray-800 dark:text-gray-200"
             >
               <item.icon size={24} />
               {isOpen && <span className="text-lg cursor-pointer font-medium">{item.label}</span>}
@@ -96,16 +112,20 @@ const Sidebar = () => {
               className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-52  rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
             >
               <div className="flex flex-col">
-                <button className="w-full text-left cursor-pointer px-4 py-3 transition hover:from-pink-500 hover:to-rose-600 dark:hover:bg-gray-700">
+                <button className="w-full text-left cursor-pointer px-4 py-3 transition hover:bg-gradient-to-r from-pink-400 to-purple-500 hover:dark:hover:bg-gradient-to-r from-pink-400 to-purple-500">
                   Profile
                 </button>
-                <button className="w-full text-left cursor-pointer px-4 py-3 transition hover:bg-gray-200 dark:hover:bg-gray-700">
+                <button className="w-full text-left cursor-pointer px-4 py-3 transition hover:bg-gradient-to-r from-pink-400 to-purple-500 hover:dark:bg-gradient-to-r from-pink-400 to-purple-500">
                   Settings
                 </button>
-                <button className="w-full text-left cursor-pointer px-4 py-3 transition hover:bg-gray-200 dark:hover:bg-gray-700">
+                <button
+                onClick={() => navigate("/update-avatar")}
+                className="w-full text-left cursor-pointer px-4 py-3 transition hover:bg-gradient-to-r from-pink-400 to-purple-500 hover:dark:bg-gradient-to-r from-pink-400 to-purple-500">
                   Update Avatar
                 </button>
-                <button className="w-full text-left cursor-pointer px-4 py-3 transition hover:bg-gray-200 dark:hover:bg-gray-700">
+                <button
+                
+                className="w-full text-left cursor-pointer px-4 py-3 transition hover:bg-gradient-to-r from-pink-400 to-purple-500  hover:dark:bg-gradient-to-r from-pink-400 to-purple-500">
                   Privacy
                 </button>
                 <button

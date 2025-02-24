@@ -13,13 +13,13 @@ const Loader = () => {
     cy="50"
     r="40"
     stroke="url(#gradient)"
-    stroke-width="8"
-    stroke-linecap="round"
-    stroke-dasharray="220"
-    stroke-dashoffset="220"
+    strokeWidth="8"
+    strokeLinecap="round"
+    strokeDasharray="220"
+    strokeDashoffset="220"
   >
     <animate
-      attributeName="stroke-dashoffset"
+      attributeName="strokeDashoffset"
       values="220; 0"
       dur="2s"
       repeatCount="indefinite"
@@ -28,14 +28,14 @@ const Loader = () => {
   <polyline
     points="30,50 45,65 75,35"
     stroke="url(#gradient)"
-    stroke-width="8"
+    strokeWidth="8"
     fill="none"
-    stroke-linecap="round"
-    stroke-dasharray="50"
-    stroke-dashoffset="50"
+    strokeLinecap="round"
+    strokeDasharray="50"
+    strokeDashoffset="50"
   >
     <animate
-      attributeName="stroke-dashoffset"
+      attributeName="strokeDashoffset"
       values="50; 0"
       dur="1s"
       begin="1s"

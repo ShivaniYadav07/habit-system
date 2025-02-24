@@ -17,14 +17,14 @@ const Avatar = () => {
     localStorage.setItem("hasCompletedAvatar", "true");
   }, []);
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    console.log("📂 File Selected:", file);
+  // const handleFileChange = (event) => {
+  //   const file = event.target.files[0];
+  //   console.log("📂 File Selected:", file);
 
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
+  //   if (file) {
+  //     setSelectedFile(file);
+  //   }
+  // };
 
   const generateNewAvatar = () => {
     setAvatarSeed(Math.random().toString(36).substring(7));
@@ -37,14 +37,12 @@ const Avatar = () => {
     setLoading(true);
     
     try {
-      // ✅ Clone Response Before Using blob()
       const response = await fetch(avatar);
-      const responseClone = response.clone();
   
       const blob = await response.blob();
   
       const formData = new FormData();
-      formData.append("avatar", blob, "avatar.png"); // ✅ File Append
+      formData.append("avatar", blob, "avatar.png"); 
   
       const token = user?.token;
       const res = await axios.post("/api/v1/upload-avatar", formData, {
@@ -54,9 +52,6 @@ const Avatar = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-  
-      // ✅ Debugging API Response
-      console.log("✅ Full API Response:", res.data);
   
       if (!res.data || !res.data.avatar) {
         throw new Error("Avatar URL missing in API response");
@@ -93,7 +88,7 @@ const Avatar = () => {
         </div>
 
         <div className="mt-4 w-full">
-          <label className="text-white text-lg font-semibold">Choose Style:</label>
+          {/* <label className="text-white text-lg font-semibold">Choose Style:</label> */}
           <select
             className="w-full p-3 rounded-lg bg-white/30 text-white dark:bg-gray-700 dark:text-white border border-white/40"
             value={avatarStyle}
@@ -107,13 +102,13 @@ const Avatar = () => {
           </select>
         </div>
 
-        <input
+        {/* <input
           type="file"
           id="avatarInput"
           accept="image/*"
           className="mt-4 p-2 w-full text-white"
           onChange={handleFileChange} 
-        />
+        /> */}
 
         <div className="flex justify-center gap-4 mt-6">
           <Button onClick={generateNewAvatar} className="px-6 py-3 bg-purple-500 text-white font-bold rounded-lg">

@@ -9,6 +9,8 @@ import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Welcome from "./pages/Welcome";
 import Avatar from "./components/Avatar";
+import { LoaderProvider } from "./utility/LoaderContext";
+import UpdateAvatar from "./pages/UpdateAvatar";
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -25,6 +27,7 @@ const Layout = ({ children }) => {
 const App = () => {
   return (
     <>
+    <LoaderProvider/>
       <ToggleTheme />
       <Router>
         <Routes>
@@ -77,6 +80,16 @@ const App = () => {
               <ProtectedRoute>
                 <Layout>
                   <Avatar />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update-avatar"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <UpdateAvatar />
                 </Layout>
               </ProtectedRoute>
             }
