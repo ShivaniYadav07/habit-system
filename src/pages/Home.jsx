@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Card } from "../utility/Card";
 import { Button } from "../utility/Button";
 import Loader from "../components/Loader";
 import { useAuth } from "../components/AuthContext";
 import { FaDumbbell, FaBookOpen, FaPrayingHands, FaRunning, FaLeaf, FaBrain } from "react-icons/fa"; // ✅ Import Icons
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css"; 
+import EditHabitModal from "../components/EditHabitModal";
+import "react-circular-progressbar/dist/styles.css";
 const habitIcons = {
   exercise: <FaDumbbell className="text-4xl text-red-500" />,
   reading: <FaBookOpen className="text-4xl text-blue-500" />,
@@ -25,8 +25,9 @@ const Home = () => {
     description: "",
     frequency: "daily",
   });
-
-  // ✅ Backend se Habits Load karne ka Function
+  const [editData, setEditData] = useState({ name: "", description: "", frequency: "" });
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedHabit, setSelectedHabit] = useState(null);
   const fetchHabits = async () => {
     try {
       const response = await axios.get("/api/v1/gethabit", {
@@ -44,7 +45,6 @@ const Home = () => {
     fetchHabits();
   }, []);
 
-  // ✅ Backend Par Habit Save Karne Ka Function
   const addHabit = async () => {
     if (!newHabit.name.trim()) return alert("Please enter a habit name!");
 
@@ -65,9 +65,97 @@ const Home = () => {
     }
   };
 
+  const completeHabit = async (habitId, lastCompleted) => {
+    const today = new Date().toDateString();
+    const lastCompletedDate = lastCompleted ? new Date(lastCompleted).toDateString() : null;
+
+    // ✅ Prevent API call if habit is already completed today
+    if (lastCompletedDate === today) {
+      alert("✅ You have already completed this habit today!");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        "/api/v1/complete",
+        { habitId },
+        { headers: { Authorization: `Bearer ${user?.token}` } }
+      );
+
+      setHabits((prevHabits) =>
+        prevHabits.map((habit) =>
+          habit._id === habitId
+            ? { ...habit, streak: response.data.habitStreak, lastCompleted: new Date() }
+            : habit
+        )
+      );
+
+      setUserData((prevUser) => ({
+        ...prevUser,
+        streak: response.data.userStreak,
+        longestStreak: response.data.longestStreak,
+      }));
+
+      alert("Habit Marked as Completed!");
+    } catch (error) {
+      alert("Error completing habit, please try again.");
+    }
+  };
+
+  const deleteHabit = async (habitId) => {
+    const confirmDelete = window.confirm("❌ Are you sure you want to delete this habit?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`/api/v1/delete/${habitId}`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+
+      setHabits((prevHabits) => prevHabits.filter((habit) => habit._id !== habitId));
+
+      alert("✅ Habit deleted successfully!");
+    } catch (error) {
+      alert("❌ Error deleting habit, please try again.");
+    }
+  };
+
+ 
+
+  const handleRippleEffect = (e) => {
+    const button = e.currentTarget;
+
+    const ripple = document.createElement("span");
+    ripple.classList.add("ripple");
+
+    const size = Math.max(button.clientWidth, button.clientHeight);
+    const rect = button.getBoundingClientRect();
+
+    ripple.style.width = ripple.style.height = `${size}px`;
+    ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+    ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+
+    button.appendChild(ripple);
+
+    setTimeout(() => {
+      ripple.remove();
+    }, 600);
+  };
+
+  const handleEditHabitClick = (habit) => {
+    setSelectedHabit(habit);
+    setIsEditing(true);
+  };
+
+  const handleSaveHabit = (updatedHabit) => {
+    console.log("Updated Habit:", updatedHabit);
+    setIsEditing(false);
+  };
+
   return (
     <div className="p-6 space-y-8">
       <h1 className="text-4xl font-bold text-center">Your Habit Tracker</h1>
+
+
       {loading ? (
         <Loader />
       ) : (
@@ -87,16 +175,22 @@ const Home = () => {
                   <div className="w-16 h-16 flex items-center justify-center bg-gray-800/80 rounded-full shadow-md mb-4">
                     {icon}
                   </div>
-
-                  <h2 className="text-xl font-bold text-white text-center">{habit.name}</h2>
-                  <p className="text-sm text-gray-300 text-center">{habit.description || "No description provided"}</p>
-
+                  <button
+                    onClick={(e) => {
+                      handleRippleEffect(e);
+                      handleEditHabitClick(habit); // Habit edit modal open function
+                    }}
+                    className="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-500 cursor-pointer transition duration-300"
+                  >
+                    ✏️
+                  </button>
+                  <h2 className="text-xl font-bold  text-center">{habit.name}</h2>
+                  <p className="text-sm text-center">{habit.description || "No description provided"}</p>
                   <div className="w-24 h-24 mt-4">
                     <CircularProgressbar
                       value={progress}
                       text={`${habit.streak} days`}
                       styles={buildStyles({
-                        textColor: "#fff",
                         pathColor: "#4ADE80",
                         trailColor: "#1E293B",
                         textSize: "14px",
@@ -104,21 +198,43 @@ const Home = () => {
                     />
                   </div>
 
-                  <p className="text-sm text-gray-400 mt-2">Frequency: {habit.frequency}</p>
-
-                  <Button className="mt-4 px-6 py-2 bg-green-500 text-white font-bold rounded-lg shadow-lg hover:bg-green-600">
-                    Mark Done
+                  <p className="text-sm  mt-2">Frequency: {habit.frequency}</p>
+                  <Button
+                    onClick={() => completeHabit(habit._id, habit.lastCompleted)}
+                    className={`mt-4 w-full py-2 rounded-lg text-white font-bold transition ${habit.lastCompleted && new Date(habit.lastCompleted).toDateString() === new Date().toDateString()
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-500 hover:bg-green-600"
+                      }`}
+                  >
+                    {habit.lastCompleted && new Date(habit.lastCompleted).toDateString() === new Date().toDateString()
+                      ? "✅ Completed Today"
+                      : "✔️ Mark as Done"}
                   </Button>
+                  <Button
+                    onClick={() => deleteHabit(habit._id)}
+                    className="mt-2 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-lg transition"
+                  >
+                    🗑 Delete Habit
+                  </Button>
+
+
                 </div>
               );
             })
           )}
         </div>
       )}
-
-{showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white dark:bg-gray-900 p-8 rounded-3xl w-[500px] shadow-2xl transition-all scale-105 backdrop-blur-xl border border-white/20">
+      <div className="flex justify-center">
+        <Button
+          className=" font-bold py-3 px-6 rounded-lg hover:shadow-lg"
+          onClick={() => setShowModal(true)}
+        >
+          ➕ Add New Habit
+        </Button>
+      </div>
+      {showModal && (
+        <div className="fixed inset-0  bg-opacity-50 flex backdrop-blur-xl justify-center items-center">
+          <div className="bg-white dark:bg-gray-900 p-8 rounded-3xl w-[500px] shadow-2xl transition-all scale-105  border border-white/20">
             <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6">
               ✨ Create a New Habit
             </h2>
@@ -142,7 +258,7 @@ const Home = () => {
               <select
                 value={newHabit.frequency}
                 onChange={(e) => setNewHabit({ ...newHabit, frequency: e.target.value })}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full p-3 border cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -167,6 +283,13 @@ const Home = () => {
           </div>
         </div>
       )}
+
+      <EditHabitModal
+        isOpen={isEditing}
+        habitData={selectedHabit}
+        onClose={() => setIsEditing(false)}
+        onSave={handleSaveHabit}
+      />
     </div>
   );
 };
