@@ -119,8 +119,6 @@ const Home = () => {
     }
   };
 
- 
-
   const handleRippleEffect = (e) => {
     const button = e.currentTarget;
 
@@ -148,8 +146,14 @@ const Home = () => {
 
   const handleSaveHabit = (updatedHabit) => {
     console.log("Updated Habit:", updatedHabit);
+  
+    setHabits((prevHabits) =>
+      prevHabits.map((habit) => (habit._id === updatedHabit._id ? updatedHabit : habit))
+    );
+  
     setIsEditing(false);
   };
+  
 
   return (
     <div className="p-6 space-y-8">
